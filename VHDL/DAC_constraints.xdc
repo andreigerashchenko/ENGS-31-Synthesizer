@@ -14,14 +14,14 @@ set_property PACKAGE_PIN W5 [get_ports clk_iport_100MHz]
 ## Switch_ports
 ##====================================================================
 ## SWITCH 0
-set_property PACKAGE_PIN V17 [get_ports {data_in_port[0]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[0]}]
+set_property PACKAGE_PIN V17 [get_ports {sw1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {sw1}]
 ## SWITCH 1
-set_property PACKAGE_PIN V16 [get_ports {data_in_port[1]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[1]}]
+set_property PACKAGE_PIN V16 [get_ports {sw2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {sw2}]
 ## SWITCH 2
-set_property PACKAGE_PIN W16 [get_ports {data_in_port[2]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[2]}]
+set_property PACKAGE_PIN W16 [get_ports {sw3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {sw3}]
 ## SWITCH 3
 set_property PACKAGE_PIN W17 [get_ports {data_in_port[3]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[3]}]
@@ -38,17 +38,17 @@ set_property PACKAGE_PIN W14 [get_ports {data_in_port[6]}]
 set_property PACKAGE_PIN W13 [get_ports {data_in_port[7]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[7]}]
 ## SWITCH 8
-set_property PACKAGE_PIN V2 [get_ports {data_in_port[8]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[8]}]
+#set_property PACKAGE_PIN V2 [get_ports {data_in_port[8]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[8]}]
 ## SWITCH 9
-set_property PACKAGE_PIN T3 [get_ports {data_in_port[9]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[9]}]
+#set_property PACKAGE_PIN T3 [get_ports {data_in_port[9]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[9]}]
 ## SWITCH 10
-set_property PACKAGE_PIN T2 [get_ports {data_in_port[10]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[10]}]
+#set_property PACKAGE_PIN T2 [get_ports {data_in_port[10]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[10]}]
 ## SWITCH 11
-set_property PACKAGE_PIN R3 [get_ports {data_in_port[11]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[11]}]
+#set_property PACKAGE_PIN R3 [get_ports {data_in_port[11]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[11]}]
 
 ##====================================================================
 ## Buttons
@@ -69,6 +69,13 @@ set_property PACKAGE_PIN L2 [get_ports {data_out_port}]
 #Sch name = JA4
 set_property PACKAGE_PIN G2 [get_ports {clk_out_port}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {clk_out_port}]
+
+##====================================================================
+## Pmod Header JB
+##====================================================================
+#Sch name = JB1
+set_property PACKAGE_PIN A14 [get_ports {load_debug_port}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {load_debug_port}]
 
 ##====================================================================
 ## Implementation Assist
