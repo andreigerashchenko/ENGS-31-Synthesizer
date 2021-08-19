@@ -11,12 +11,12 @@ entity DAC_out is
        clk_in_port      :   in  std_logic;
        data_in_port     :   in  std_logic_vector(15 downto 0); -- Signed 16-bit sine wave generator output
        dac_trigger      :   in  std_logic;
+       note_on_port     :   in  std_logic;
 
        -- Outputs
        data_out_port    :   out std_logic;
        cs_out_port      :   out std_logic;
-       clk_out_port     :   out std_logic;
-       load_debug_port  :   out std_logic
+       clk_out_port     :   out std_logic
     );
 end entity DAC_out;
 
@@ -43,10 +43,10 @@ begin
             if count_reset = '0' then
                 if curr_count = (N_BITS - 1) then
                     curr_count <= (others => '0');
---                    count_done <= '1';
+                     
                 else
                     curr_count <= curr_count + 1;
---                    count_done <= '0';
+                      
                 end if;
             else
                 curr_count <= (others => '0');
@@ -61,22 +61,19 @@ begin
     end process shift_counter;
 
     -- Datapath for DAC
-    DAC_datapath: process(clk_in_port, load_en, shift_en, data_out)
+    DAC_datapath: process(clk_in_port, load_en, shift_en, data_out, note_on_port)
     begin
         if rising_edge(clk_in_port) then
             if load_en = '1' then
                 data_out <= "0000" & not(data_in_port(11)) & data_in_port(10 downto 0);
-                --data_out <= std_logic_vector(unsigned(std_logic_vector(signed(data_in_port) + x"2047")));
-                --data_out <= std_logic_vector(unsigned(data_in_port));
---                data_out <= "0000" & std_logic_vector(resize(unsigned(std_logic_vector(signed(data_in_port(11 downto 0)) + x"2047")), 12));
-                --data_out <= std_logic_vector(resize("0000" & (std_logic_vector(unsigned(std_logic_vector(signed(data_in_port(11 downto 0) + x"2047"))))), 16));
+                -- data_out <= "0000" & std_logic_vector(signed(data_in_port(11 downto 0)) + x"800");
             end if;
 
             if shift_en = '1' then
                 data_out <= data_out(14 downto 0) & '0';
             end if;
         end if;
-
+ 
         bit_out <= data_out(15);
     end process DAC_datapath;
 
@@ -127,6 +124,5 @@ begin
     data_out_port <= bit_out;
     cs_out_port <= cs_out;
     clk_out_port <= clk_in_port; -- Pass through clock
-    load_debug_port <= load_en;
 
 end architecture behavior;

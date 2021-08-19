@@ -21,17 +21,16 @@ use UNISIM.Vcomponents.ALL;
 entity Synthesizer_top_level is
 port (  
 	clk_iport_100MHz 	: in  std_logic;
---	midi_in_port        : in std_logic_vector(8 downto 0); -- will be used for the MIDI input, the value 8 downto 0 is just for testing need to change when actually using midi					
-	data_in_port		: in  std_logic_vector(7 downto 0); -- changed for MIDI testbenching
-	dac_trigger			: in  std_logic;
-	sw1                 : in  std_logic;
-	sw2                 : in  std_logic;
-    sw3                 : in  std_logic;
+  	midi_in_port        : in  std_logic;		
+	data_in_port		: in  std_logic_vector(15 downto 0); -- changed for MIDI testbenching
+	-- sw1                 : in  std_logic;
+	-- sw2                 : in  std_logic;
+    -- sw3                 : in  std_logic;
 
 	cs_out_port			: out std_logic;						--chip select
 	data_out_port		: out std_logic;						--data output
 	clk_out_port		: out std_logic;						--serial clock
-	load_debug_port     : out std_logic
+    LED_port            : out std_logic_vector(15 downto 0)
 	);
 
 end entity Synthesizer_top_level; 
@@ -70,6 +69,17 @@ component dds_compiler_0
 end component;
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Note to Step Size Block Memory
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+COMPONENT blk_mem_gen_0
+  PORT (
+    clka : IN STD_LOGIC;
+    addra : IN STD_LOGIC_VECTOR(6 DOWNTO 0);
+    douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+  );
+END COMPONENT;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Sample Rate Tick Generator
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 component tick_generator is
@@ -88,10 +98,12 @@ component phase_accumulator is
         -- input ports
         clk_in_port:        in   std_logic;
         sample_rate_tick:   in   std_logic;
-        midi_data_in_port:  in   std_logic_vector(7 downto 0);
-        sw1:                in   std_logic;
-        sw2:                in   std_logic;
-        sw3:                in   std_logic;
+        step_size_port:     in   std_logic_vector(11 downto 0);
+        note_on_port:       in   std_logic;
+        p_bend_port     : in std_logic_vector(7 downto 0);
+        -- sw1:                in   std_logic;
+        -- sw2:                in   std_logic;
+        -- sw3:                in   std_logic;
         
         -- output ports
 --        sine_addr_out_port: out std_logic_vector(13 downto 0)
@@ -105,6 +117,8 @@ end component;
 component volume_control is
     port (
         -- input ports
+        clk_in_port: in std_logic;
+        note_velocity_port: in std_logic_vector(7 downto 0);
         original_sine: in std_logic_vector(15 downto 0);
         -- output ports
         modified_sine: out std_logic_vector(15 downto 0)
@@ -120,14 +134,62 @@ component DAC_out is
 	port(
 		clk_in_port			: in  std_logic;	--Slower clock
 		clk_out_port		: out std_logic;
+        note_on_port        : in  std_logic;
     	
 		data_in_port		: in  std_logic_vector(15 downto 0);
 		dac_trigger			: in  std_logic;	--datapath signals
 		
 		data_out_port		: out std_logic;
-		cs_out_port			: out std_logic;
-		load_debug_port     : out std_logic);
+		cs_out_port			: out std_logic);
 end component;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--UART receiver
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+component uart_receiver is
+    generic (
+        CYCLES_PER_BIT  :   integer;
+        CYCLES_PER_HALF :   integer;
+        BIT_AMOUNT      :   integer);
+    port (
+        clk_port    :   in  std_logic;
+        rx_port     :   in  std_logic;
+
+        byte_port   :   out std_logic_vector(7 downto 0);
+        rx_done_tick:   out std_logic);
+end component uart_receiver;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--MIDI receiver
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+component midi_receive is
+    generic (
+        BYTE_AMOUNT :   integer);
+    port (
+        clk_port    :   in  std_logic;
+        trigger_port:   in  std_logic;
+        byte_port   :   in  std_logic_vector(7 downto 0);
+
+        assembled   :   out std_logic_vector(23 downto 0);
+        done_port   :   out std_logic);
+end component midi_receive;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--MIDI decoder
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+component midi_decode is
+    port (
+        clk_port    :   in  std_logic;
+        trigger_port:   in  std_logic;
+        data_port   :   in  std_logic_vector(23 downto 0);
+
+        note_on_port:   out std_logic;
+        channel_port:   out std_logic_vector(3 downto 0);
+        note_id_port:   out std_logic_vector(7 downto 0);
+        velocity_port:  out std_logic_vector(7 downto 0);
+        p_bend_port:    out std_logic_vector(7 downto 0));
+end component midi_decode;
+
 
 --=============================================================
 --Local Signal Declaration
@@ -139,13 +201,28 @@ signal load_en: std_logic := '0';
 signal cs_out:	std_logic := '0';
 signal bit_out:	std_logic := '0';
 signal locked:  std_logic := '0';
+signal inputs:  std_logic_vector(15 downto 0) := (others => '0');
+
+
+signal data_received:   std_logic := '0';
+signal note_on:         std_logic := '0';
+signal midi_channel:    std_logic_vector(3 downto 0) := (others => '0');
+signal note_id_sig:     std_logic_vector(7 downto 0) := (others => '0');
+signal note_velocity:   std_logic_vector(7 downto 0) := (others => '0');
+signal pitch_offset:std_logic_vector(7 downto 0) := "01000000";
 
 signal dec_vol_sine: std_logic_vector(15 downto 0) := (others => '0');
 
 signal sine_addr: std_logic_vector(15 downto 0) := (others => '0');
 signal data: std_logic_vector(11 downto 0) := (others => '0');	-- A/D data
 signal sine_wave: std_logic_vector(15 downto 0) := (others => '0');
-signal data_ready : std_logic := '0'; 
+signal sine_ready : std_logic := '0';
+
+signal step_size:   std_logic_vector(11 downto 0);
+
+signal current_byte:    std_logic_vector(7 downto 0);
+signal current_data:    std_logic_vector(23 downto 0);
+signal data_ready:      std_logic := '0';
 
 
 --=============================================================
@@ -174,8 +251,20 @@ dds_compiler : dds_compiler_0
     aclk => clk_divided,
     s_axis_phase_tvalid => '1',
     s_axis_phase_tdata => sine_addr,
-    m_axis_data_tvalid => data_ready,
+    m_axis_data_tvalid => sine_ready,
     m_axis_data_tdata => sine_wave
+  );
+
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Note to Step Size Block Memory
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+midi_block_memory : blk_mem_gen_0
+  PORT MAP (
+    clka => clk_divided,
+    addra => note_id_sig(6 downto 0),
+    -- addra => inputs(6 downto 0),
+    douta => step_size
   );
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -196,11 +285,9 @@ phase_acc : phase_accumulator
         -- input ports
         clk_in_port        => clk_divided,
         sample_rate_tick   => take_sample,
-        midi_data_in_port  => data_in_port,
-        sw1                => sw1,
-        sw2                => sw2,
-        sw3                => sw3,
-        
+        step_size_port     => step_size,
+        note_on_port       => note_on,
+        p_bend_port        => pitch_offset,
         -- output ports
         sine_addr_out_port => sine_addr
     );
@@ -211,6 +298,8 @@ phase_acc : phase_accumulator
 volume: volume_control
     port map (
         -- input ports
+        clk_in_port => clk_divided,
+        note_velocity_port => note_velocity,
         original_sine => sine_wave,
         -- output ports
         modified_sine => dec_vol_sine
@@ -225,12 +314,66 @@ generic map(
 port map(
 	clk_in_port			=> clk_divided,
 	clk_out_port		=> clk_out_port,
---	data_in_port		=> data_in_port,
     data_in_port        => dec_vol_sine,
---	dac_trigger			=> dac_trigger,
     dac_trigger         => take_sample,
 	data_out_port		=> data_out_port,
 	cs_out_port			=> cs_out_port,
-	load_debug_port     => load_debug_port);   
+    note_on_port        => note_on);  
+    
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--UART receiver
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+receive_uart: uart_receiver
+    generic map(
+        CYCLES_PER_BIT  =>   154, -- 32 us / 0.2083333 us = 153.6 ~= 154
+        CYCLES_PER_HALF =>   77,
+        BIT_AMOUNT      =>   10)
+    port map(
+        clk_port    =>   clk_divided,
+        rx_port     =>   midi_in_port,
+
+        byte_port   =>   current_byte,
+        rx_done_tick=>   data_received);
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--MIDI receiver
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+midi_receiver: midi_receive
+    generic map(
+        BYTE_AMOUNT =>   3)
+    port map(
+        clk_port    =>   clk_divided,
+        trigger_port=>   data_received,
+        byte_port   =>   current_byte,
+
+        assembled   =>   current_data,
+        done_port   =>   data_ready);
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--MIDI decoder
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+midi_decoder: midi_decode
+    port map(
+        clk_port    =>   clk_divided,
+        trigger_port=>   data_ready,
+        data_port   =>   current_data,
+
+        note_on_port=>   note_on,
+        channel_port=>   midi_channel,
+        note_id_port=>   note_id_sig,
+        velocity_port=>  note_velocity,
+        p_bend_port =>   pitch_offset);
+
+
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--Mapping input data to LEDs:
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+map_input_LED: process(data_in_port, inputs, note_id_sig, note_on, current_byte, midi_in_port, current_data, note_velocity, pitch_offset)
+begin
+    inputs <= data_in_port;
+    -- LED_port <= inputs;
+    LED_port <= current_data(23 downto 20) & "0" & not(note_on) & note_on & "0" & pitch_offset;
+end process map_input_LED;
 end Behavioral; 
 
