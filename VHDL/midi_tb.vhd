@@ -10,7 +10,7 @@ architecture testbench of midi_tb is
         port
          (-- Clock in ports
           -- Clock out ports
-          clk_4800khz          	: out    std_logic;
+          clk_9600khz          	: out    std_logic;
           -- Status and control signals
           locked            	: out    std_logic;
           clk_100mhz           	: in     std_logic

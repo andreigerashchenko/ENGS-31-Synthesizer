@@ -1,7 +1,3 @@
-----------------------------------------------------------------------------------
-
-----------------------------------------------------------------------------------
-
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -12,28 +8,28 @@ USE ieee.numeric_std.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity phase_acc_tb is
-end phase_acc_tb;
+entity note_addr_counter_tb is
+end note_addr_counter_tb;
 
-architecture Behavioral of phase_acc_tb is
+architecture Behavioral of note_addr_counter_tb is
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Component Declarations
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++
-
---+++++++++++++++++++++++++++++++++++++++++++++++++++++
--- Phase Accumulator
---+++++++++++++++++++++++++++++++++++++++++++++++++++++
-component phase_accumulator is
+component note_addr_counter is
     port (
-        -- input ports
-        clk_in_port:        in   std_logic;
-        midi_data_in_port:  in   std_logic_vector(7 downto 0);
-        sample_rate_tick:   in   std_logic;
-        -- output ports
-        sw1:                in   std_logic;
-        sw2:                in   std_logic;
---        sine_addr_out_port: out std_logic_vector(13 downto 0)
-        sine_addr_out_port: out std_logic_vector(15 downto 0)
+        -- timing inputs
+        clk_in_port    :        in std_logic;
+        take_sample    :        in std_logic;
+
+        -- note inputs for SINE LUT
+        note_1_in_port :        in std_logic_vector(15 downto 0);
+        note_2_in_port :        in std_logic_vector(15 downto 0);
+        note_3_in_port :        in std_logic_vector(15 downto 0);
+
+        -- ouput ports
+        sine_addr_port :        out std_logic_vector(15 downto 0);
+        acc_clr_port   :        out std_logic;
+        acc_en_port    :        out std_logic
     );
 end component;
 
@@ -78,15 +74,41 @@ component tick_generator is
 end component;
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Sine Wave Accumulator
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++
+component sine_wave_acc is
+    port (
+        -- Timing
+        clk_in_port         : in std_logic;
+
+        -- Sine Wave Data
+        sine_wave_in_port   : in std_logic_vector(15 downto 0);
+
+        -- Control Signals
+        acc_clr_port        : in std_logic;
+        acc_en_port         : in std_logic;
+
+        -- output 
+        sine_wave_acc_port  : out std_logic_vector(15 downto 0)
+
+    );
+end component;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Signal Declarations
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++
 constant clk_period : time := 10ns;		-- 100 MHz clock
 
 signal clk_100MHz   : std_logic := '0';
 signal clk_divided  : std_logic := '0';
-signal midi_data    : std_logic_vector(7 downto 0);
+signal note_1       : std_logic_vector(15 downto 0) := (others => '0');
+signal note_2       : std_logic_vector(15 downto 0) := "0000000000000001";
+signal note_3       : std_logic_vector(15 downto 0) := "0000000000000010";
 signal take_sample  : std_logic := '0';
 signal sine_data    : std_logic_vector(15 downto 0);
+signal sine_data_acc: std_logic_vector(15 downto 0);
+signal acc_clr      : std_logic := '0';
+signal acc_en       : std_logic := '0';
 signal sine_addr    : std_logic_vector(15 downto 0);
 signal locked       : std_logic := '0';
 -- Placeholders for MIDI inputs, might want to delete these and others related to it
@@ -95,14 +117,17 @@ signal sw2          : std_logic := '0';
 
 begin
 
-uut: phase_accumulator
+uut: note_addr_counter
 port map (
     clk_in_port => clk_divided,
-    sample_rate_tick => take_sample,
-    midi_data_in_port => midi_data,
-    sine_addr_out_port => sine_addr,
-    sw1 => sw1,
-    sw2 => sw2
+    take_sample => take_sample,
+    note_1_in_port => note_1,
+    note_2_in_port => note_2,
+    note_3_in_port => note_3,
+        -- ouput ports
+    sine_addr_port => sine_addr,
+    acc_clr_port => acc_clr,
+    acc_en_port => acc_en
 );
 
  clocking: clk_wiz_0
@@ -125,10 +150,28 @@ dds: dds_compiler_0
 
 tick_generation: tick_generator
 generic map(
-	FREQUENCY_DIVIDER_RATIO => 100)
+	FREQUENCY_DIVIDER_RATIO => 200)
 port map( 
 	system_clk_iport 	=> clk_divided,
 	tick_oport			=> take_sample);
+	
+acc: sine_wave_acc 
+    port map (
+        -- Timing
+        clk_in_port => clk_divided,
+
+        -- Sine Wave Data
+        sine_wave_in_port => sine_data,
+
+        -- Control Signals
+        acc_clr_port => acc_clr,
+        acc_en_port => acc_en,
+
+        -- output 
+        sine_wave_acc_port => sine_data_acc
+
+    );
+
 	
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -145,8 +188,6 @@ end process;
 stim_proc: process
 begin
     
---    midi_data <= "00000001";
-    sw1 <= '1';
     wait;
 end process; 
 

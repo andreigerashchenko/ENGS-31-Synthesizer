@@ -9,30 +9,26 @@ entity phase_accumulator is
         --+++++++++++++++++++++++++++++++++++
         --Timing
         --+++++++++++++++++++++++++++++++++++
-        clk_in_port:        in   std_logic;
-        sample_rate_tick:   in   std_logic;
+        clk_in_port         :   in  std_logic;
+        sample_rate_tick    :   in  std_logic;
          --+++++++++++++++++++++++++++++++++++
         --Data Inputs
         --+++++++++++++++++++++++++++++++++++
-        step_size_port:  in   std_logic_vector(11 downto 0);
-        note_on_port    :   in  std_logic;
-        p_bend_port     : in std_logic_vector(7 downto 0);
-        
-        -- sw1:                in   std_logic;
-        -- sw2:                in   std_logic;
-        -- sw3:                in   std_logic;
+        step_size_port      :   in  std_logic_vector(11 downto 0);
+        note_on_port        :   in  std_logic;
+        p_bend_port         :   in  std_logic_vector(7 downto 0);
         
         -- output ports
-        sine_addr_out_port: out std_logic_vector(15 downto 0)
+        sine_addr_out_port  :   out std_logic_vector(15 downto 0)
     );
 end entity phase_accumulator;
 
 architecture behavior of phase_accumulator is
-    constant p_bend_center: unsigned(7 downto 0) := "01000000";
+    constant p_bend_center  :   unsigned(7 downto 0) := "01000000";
 
-    signal step_size: unsigned(13 downto 0) := (others => '0'); -- the step size for a given note
-    signal acc:     unsigned(13 downto 0) := (others => '0'); -- the address for the dds compiler
-    signal pitch_offset : unsigned(7 downto 0); 
+    signal step_size        :   unsigned(13 downto 0) := (others => '0'); -- the step size for a given note
+    signal acc              :   unsigned(13 downto 0) := (others => '0'); -- the address for the dds compiler
+    signal pitch_offset     :   unsigned(7 downto 0); 
 
 
 begin

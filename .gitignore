@@ -3,4 +3,6 @@
 /VHDL/lab6
 /VHDL/uartlab
 .vscode
+.VSCodeCounter
 *.bit
+.DS_Store

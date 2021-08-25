@@ -14,53 +14,53 @@ set_property PACKAGE_PIN W5 [get_ports clk_iport_100MHz]
 ## Switch_ports
 ##====================================================================
 ## SWITCH 0
-set_property PACKAGE_PIN V17 [get_ports {data_in_port[15]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[15]}]
-## SWITCH 1
-set_property PACKAGE_PIN V16 [get_ports {data_in_port[14]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[14]}]
-## SWITCH 2
-set_property PACKAGE_PIN W16 [get_ports {data_in_port[13]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[13]}]
-## SWITCH 3
-set_property PACKAGE_PIN W17 [get_ports {data_in_port[12]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[12]}]
-## SWITCH 4
-set_property PACKAGE_PIN W15 [get_ports {data_in_port[11]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[11]}]
-## SWITCH 5
-set_property PACKAGE_PIN V15 [get_ports {data_in_port[10]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[10]}]
-## SWITCH 6
-set_property PACKAGE_PIN W14 [get_ports {data_in_port[9]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[9]}]
-## SWITCH 7
-set_property PACKAGE_PIN W13 [get_ports {data_in_port[8]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[8]}]
-## SWITCH 8
-set_property PACKAGE_PIN V2 [get_ports {data_in_port[7]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[7]}]
-## SWITCH 9
-set_property PACKAGE_PIN T3 [get_ports {data_in_port[6]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[6]}]
-## SWITCH 10
-set_property PACKAGE_PIN T2 [get_ports {data_in_port[5]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[5]}]
-## SWITCH 11
-set_property PACKAGE_PIN R3 [get_ports {data_in_port[4]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[4]}]
-## SWITCH 12
-set_property PACKAGE_PIN W2 [get_ports {data_in_port[3]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[3]}]
-## SWITCH 13
-set_property PACKAGE_PIN U1 [get_ports {data_in_port[2]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[2]}]
-## SWITCH 14
-set_property PACKAGE_PIN T1 [get_ports {data_in_port[1]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[1]}]
-## SWITCH 15
-set_property PACKAGE_PIN R2 [get_ports {data_in_port[0]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[0]}]
+#set_property PACKAGE_PIN V17 [get_ports {data_in_port[15]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[15]}]
+### SWITCH 1
+#set_property PACKAGE_PIN V16 [get_ports {data_in_port[14]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[14]}]
+### SWITCH 2
+#set_property PACKAGE_PIN W16 [get_ports {data_in_port[13]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[13]}]
+### SWITCH 3
+#set_property PACKAGE_PIN W17 [get_ports {data_in_port[12]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[12]}]
+### SWITCH 4
+#set_property PACKAGE_PIN W15 [get_ports {data_in_port[11]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[11]}]
+### SWITCH 5
+#set_property PACKAGE_PIN V15 [get_ports {data_in_port[10]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[10]}]
+### SWITCH 6
+#set_property PACKAGE_PIN W14 [get_ports {data_in_port[9]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[9]}]
+### SWITCH 7
+#set_property PACKAGE_PIN W13 [get_ports {data_in_port[8]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[8]}]
+### SWITCH 8
+#set_property PACKAGE_PIN V2 [get_ports {data_in_port[7]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[7]}]
+### SWITCH 9
+#set_property PACKAGE_PIN T3 [get_ports {data_in_port[6]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[6]}]
+### SWITCH 10
+#set_property PACKAGE_PIN T2 [get_ports {data_in_port[5]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[5]}]
+### SWITCH 11
+#set_property PACKAGE_PIN R3 [get_ports {data_in_port[4]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[4]}]
+### SWITCH 12
+#set_property PACKAGE_PIN W2 [get_ports {data_in_port[3]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[3]}]
+### SWITCH 13
+#set_property PACKAGE_PIN U1 [get_ports {data_in_port[2]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[2]}]
+### SWITCH 14
+#set_property PACKAGE_PIN T1 [get_ports {data_in_port[1]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[1]}]
+### SWITCH 15
+#set_property PACKAGE_PIN R2 [get_ports {data_in_port[0]}]					
+#	set_property IOSTANDARD LVCMOS33 [get_ports {data_in_port[0]}]
 
 ##====================================================================
 ## LED_ports
@@ -198,14 +198,14 @@ set_property PACKAGE_PIN A14 [get_ports {midi_in_port}]
 ## Pmod Header JC
 ##====================================================================
 ##Sch name = JC1
-# set_property PACKAGE_PIN K17 [get_ports {midi_in_port}]					
-# 	set_property IOSTANDARD LVCMOS33 [get_ports {midi_in_port}]
+ set_property PACKAGE_PIN K17 [get_ports {tc_half_port}]					
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {tc_half_port}]
 ##Sch name = JC2
-#set_property PACKAGE_PIN M18 [get_ports {JC_port[1]}]					
-	#set_property IOSTANDARD LVCMOS33 [get_ports {JC_port[1]}]
+set_property PACKAGE_PIN M18 [get_ports {tc_full_port}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {tc_full_port}]
 ##Sch name = JC3
-#set_property PACKAGE_PIN N17 [get_ports {JC_port[2]}]					
-	#set_property IOSTANDARD LVCMOS33 [get_ports {JC_port[2]}]
+set_property PACKAGE_PIN N17 [get_ports {rx_sync_port}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {rx_sync_port}]
 ##Sch name = JC4
 #set_property PACKAGE_PIN P18 [get_ports {JC_port[3]}]					
 	#set_property IOSTANDARD LVCMOS33 [get_ports {JC_port[3]}]

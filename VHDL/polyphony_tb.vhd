@@ -27,7 +27,7 @@ architecture testbench of shell_tb is
     constant clk_period :   time := 10ns;		-- 100 MHz clock
 
     -- Data definitions
-    constant TxData :   std_logic_vector(89 downto 0) := ("1111111110" & "1100000000" & "1100100000" & "1111111110" & "1010000000" & "1100100000" & "1111111110" & "1001000000" & "1100100000"); -- Start/stop bits already in here
+    constant TxData :   std_logic_vector(89 downto 0) := ("0110101101" & "0001010101" & "0000000011" & "0101101101" & "0101110101" & "0000010011" & "0100101101" & "0001010001" & "0110100101"); -- Start/stop bits already in here
     constant Reversed:  std_logic_vector(89 downto 0) := ("1010010110" & "1000101000" & "1011010010" & "1100100000" & "1010111010" & "1011011010" & "1100000000" & "1010101000" & "1011010110");
     signal bit_count:   integer := 10;
 

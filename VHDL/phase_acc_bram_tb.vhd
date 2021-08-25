@@ -59,7 +59,7 @@ component clk_wiz_0
 	port
 	 (-- Clock in ports
 	  -- Clock out ports
-	  clk_4800khz          	: out    std_logic;
+	  clk_9600khz          	: out    std_logic;
 	  -- Status and control signals
 	  locked            	: out    std_logic;
 	  clk_100mhz           	: in     std_logic
@@ -121,7 +121,7 @@ port map (
  clocking: clk_wiz_0
 	port map ( 
    -- Clock out ports  
-	clk_4800khz => clk_divided,
+	clk_9600khz => clk_divided,
    -- Status and control signals                
 	locked => locked,
 	-- Clock in ports

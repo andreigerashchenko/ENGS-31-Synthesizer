@@ -10,7 +10,10 @@ entity uart_receiver is
     port (
         clk_port    :   in  std_logic;
         rx_port     :   in  std_logic;
-
+        
+        rx_sync_port:   out std_logic;
+        tc_half_port:   out std_logic;
+        tc_full_port:   out std_logic;
         byte_port   :   out std_logic_vector(7 downto 0);
         rx_done_tick:   out std_logic);
 end entity uart_receiver;
@@ -20,7 +23,11 @@ architecture behavior of uart_receiver is
     signal curr_state   :   state_type := idle;
     signal next_state   :   state_type := idle;
 
-    signal curr_count   :   unsigned(7 downto 0) := (others => '0');
+    signal fs_flop_in   :   std_logic := '1';
+    signal fs_flop_out  :   std_logic := '1';
+
+    signal curr_count   :   unsigned(8 downto 0) := (others => '0');
+    signal half_done    :   std_logic := '0';
     signal count_half   :   std_logic := '0';
     signal count_full   :   std_logic := '0';
     signal count_reset  :   std_logic := '1';
@@ -38,6 +45,16 @@ architecture behavior of uart_receiver is
     signal byte_out     :   std_logic_vector(7 downto 0) := (others => '0');
     signal rx_done      :   std_logic := '0';
 begin
+
+    -- Synchronizing incoming signals with our clock
+    flop_synchronizer: process(clk_port, rx_port, fs_flop_out)
+    begin
+        if rising_edge(clk_port) then
+            fs_flop_in <= rx_port;
+            fs_flop_out <= fs_flop_in;
+        end if;
+    end process flop_synchronizer;
+
     -- Counting cycles between data bits
     cycle_counter: process(clk_port, count_reset, curr_count)
     begin
@@ -94,7 +111,7 @@ begin
         end if;
     end process bit_counter;
 
-    receiver_FSM_comb: process(curr_state, count_half, count_full, bits_done, rx_port)
+    receiver_FSM_comb: process(curr_state, count_half, count_full, bits_done, fs_flop_out)
     begin
         next_state <= curr_state;
         shift_en <= '0';
@@ -102,10 +119,11 @@ begin
         count_reset <= '1';
         bit_count_rst <= '0';
         bit_count_run <= '0';
+        clear_shift <= '0';
 
         case (curr_state) is
             when idle =>
-                if rx_port = '1' then
+                if fs_flop_out = '1' then
                     next_state <= idle;
                 else
                     next_state <= wait_half;
@@ -153,6 +171,7 @@ begin
         end case;
     end process receiver_FSM_comb;
 
+    
     receiver_datapath: process(clk_port, packet_bits, rx_port, shift_en, load_en)
     begin
         if rising_edge(clk_port) then
@@ -185,4 +204,7 @@ begin
     
     byte_port <= byte_out;
     rx_done_tick <= rx_done;
+    tc_half_port <= count_half;
+    tc_full_port <= count_full;
+    rx_sync_port <= fs_flop_out;
 end architecture behavior;

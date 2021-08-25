@@ -11,7 +11,6 @@ entity DAC_out is
        clk_in_port      :   in  std_logic;
        data_in_port     :   in  std_logic_vector(15 downto 0); -- Signed 16-bit sine wave generator output
        dac_trigger      :   in  std_logic;
-       note_on_port     :   in  std_logic;
 
        -- Outputs
        data_out_port    :   out std_logic;
@@ -61,7 +60,7 @@ begin
     end process shift_counter;
 
     -- Datapath for DAC
-    DAC_datapath: process(clk_in_port, load_en, shift_en, data_out, note_on_port)
+    DAC_datapath: process(clk_in_port, load_en, shift_en, data_out)
     begin
         if rising_edge(clk_in_port) then
             if load_en = '1' then
